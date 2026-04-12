@@ -67,7 +67,7 @@ export default function CourseEnroll() {
     REJECTED: { label: '거절됨', color: 'bg-rose-100 text-rose-600' },
   };
 
-  const DIFFICULTY: Record<number, string> = { 1: '기초', 2: '초급', 3: '중급', 4: '고급', 5: '심화' };
+  const DIFFICULTY: Record<string, string> = { EASY: '기초', MEDIUM: '중급', HARD: '고급' };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30">
@@ -272,9 +272,9 @@ export default function CourseEnroll() {
                               title={skill.description}
                             >
                               {skill.name}
-                              {skill.difficulty > 0 && (
+                              {skill.difficulty && (
                                 <span className="text-[9px] text-indigo-400">
-                                  {DIFFICULTY[skill.difficulty] ?? `Lv.${skill.difficulty}`}
+                                  {DIFFICULTY[skill.difficulty] ?? skill.difficulty}
                                 </span>
                               )}
                             </span>

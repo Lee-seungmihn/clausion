@@ -81,7 +81,7 @@ export default function CurriculumUpload() {
   // 스킬 CRUD mutations
   const updateSkillMut = useMutation({
     mutationFn: (data: { skillId: string; name: string; description: string; difficulty: string }) =>
-      coursesApi.updateSkill(courseId!, data.skillId, { name: data.name, description: data.description, difficulty: data.difficulty as unknown as number }),
+      coursesApi.updateSkill(courseId!, data.skillId, { name: data.name, description: data.description, difficulty: data.difficulty }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['courses', courseId, 'skills'] });
       setEditSkill(null);
