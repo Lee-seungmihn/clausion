@@ -61,4 +61,8 @@ export const coursesApi = {
   deleteSkill(courseId: string, skillId: string): Promise<void> {
     return api.delete<void>(`/api/courses/${courseId}/skills/${skillId}`);
   },
+
+  createDefaultSkills(courseId: string): Promise<CurriculumSkill[]> {
+    return api.post<CurriculumSkill[]>(`/api/courses/${courseId}/skills/defaults`);
+  },
 };

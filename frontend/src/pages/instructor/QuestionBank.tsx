@@ -592,16 +592,32 @@ export default function QuestionBank() {
         <div className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">스킬 (선택)</label>
-            <select
-              value={genSkillId}
-              onChange={(e) => setGenSkillId(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl bg-white focus:outline-none focus:border-indigo-400"
-            >
-              <option value="">전체 스킬</option>
-              {skills.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
+            {skills.length === 0 ? (
+              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
+                <p className="text-xs text-amber-700 mb-2">등록된 스킬이 없습니다. 기본 코딩 스킬을 추가하세요.</p>
+                <button
+                  onClick={() => {
+                    coursesApi.createDefaultSkills(courseId!).then(() => {
+                      queryClient.invalidateQueries({ queryKey: ['courses', courseId, 'skills'] });
+                    });
+                  }}
+                  className="px-3 py-1.5 text-xs font-medium rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition-colors"
+                >
+                  기본 코딩 스킬 추가
+                </button>
+              </div>
+            ) : (
+              <select
+                value={genSkillId}
+                onChange={(e) => setGenSkillId(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl bg-white focus:outline-none focus:border-indigo-400"
+              >
+                <option value="">전체 스킬</option>
+                {skills.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name} ({s.difficulty === 'EASY' ? '기초' : s.difficulty === 'MEDIUM' ? '중급' : '고급'})</option>
+                ))}
+              </select>
+            )}
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">난이도 (선택)</label>

@@ -132,6 +132,51 @@ public class CurriculumController {
         return ResponseEntity.status(HttpStatus.CREATED).body(SkillResponse.from(skill));
     }
 
+    @PostMapping("/skills/defaults")
+    @Transactional
+    public ResponseEntity<List<SkillResponse>> createDefaultSkills(@PathVariable Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("Course not found: " + courseId));
+
+        // 이미 스킬이 있으면 중복 생성 방지
+        if (!skillRepository.findByCourseId(courseId).isEmpty()) {
+            return ResponseEntity.ok(skillRepository.findByCourseId(courseId).stream()
+                    .map(SkillResponse::from).toList());
+        }
+
+        var defaults = List.of(
+                new String[]{"변수와 데이터 타입", "변수 선언, 기본 데이터 타입(int, string, boolean 등), 타입 변환", "EASY"},
+                new String[]{"조건문", "if/else, switch/case, 삼항 연산자를 활용한 흐름 제어", "EASY"},
+                new String[]{"반복문", "for, while, do-while 루프와 break/continue 활용", "EASY"},
+                new String[]{"배열과 리스트", "배열 선언, 인덱싱, 슬라이싱, 리스트 조작 메서드", "EASY"},
+                new String[]{"함수와 메서드", "함수 정의, 매개변수, 반환값, 스코프, 순수 함수", "MEDIUM"},
+                new String[]{"문자열 처리", "문자열 메서드, 포매팅, 정규표현식 기초, 파싱", "MEDIUM"},
+                new String[]{"객체지향 프로그래밍", "클래스, 객체, 상속, 다형성, 캡슐화, 추상화", "MEDIUM"},
+                new String[]{"예외 처리", "try/catch, 예외 계층, 커스텀 예외, 에러 핸들링 전략", "MEDIUM"},
+                new String[]{"재귀 함수", "재귀 호출, 기저 조건, 꼬리 재귀, 메모이제이션", "HARD"},
+                new String[]{"자료구조", "스택, 큐, 해시맵, 트리, 그래프의 개념과 활용", "HARD"},
+                new String[]{"정렬과 탐색 알고리즘", "버블/선택/삽입/퀵/병합 정렬, 이진 탐색", "HARD"},
+                new String[]{"클로저와 고차 함수", "클로저 개념, map/filter/reduce, 콜백 패턴", "HARD"},
+                new String[]{"비동기 프로그래밍", "콜백, Promise, async/await, 이벤트 루프", "HARD"},
+                new String[]{"디자인 패턴", "싱글톤, 팩토리, 옵저버, 전략 패턴 등 핵심 패턴", "HARD"},
+                new String[]{"테스트와 디버깅", "단위 테스트, 테스트 주도 개발, 디버깅 기법", "MEDIUM"}
+        );
+
+        List<CurriculumSkill> created = new java.util.ArrayList<>();
+        for (String[] d : defaults) {
+            CurriculumSkill skill = CurriculumSkill.builder()
+                    .course(course)
+                    .name(d[0])
+                    .description(d[1])
+                    .difficulty(d[2])
+                    .build();
+            created.add(skillRepository.save(skill));
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(created.stream().map(SkillResponse::from).toList());
+    }
+
     @DeleteMapping("/skills/{skillId}")
     public ResponseEntity<Void> deleteSkill(
             @PathVariable Long courseId,
