@@ -257,3 +257,13 @@
 [ 1267875ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4175/api/notifications/stream?token=fake-token:0
 [ 1272877ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4175/api/notifications/stream?token=fake-token:0
 [ 1277881ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4175/api/notifications/stream?token=fake-token:0
+[ 1282883ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4175/api/notifications/stream?token=fake-token:0
+[ 1287886ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4175/api/notifications/stream?token=fake-token:0
+[ 1292889ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4175/api/notifications/stream?token=fake-token:0
+[ 1297891ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4175/api/notifications/stream?token=fake-token:0
+[ 1302893ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4175/api/notifications/stream?token=fake-token:0
+[ 1307896ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4175/api/notifications/stream?token=fake-token:0
+[ 1312898ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4175/api/notifications/stream?token=fake-token:0
+[ 1317901ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4175/api/notifications/stream?token=fake-token:0
+[ 1322904ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4175/api/notifications/stream?token=fake-token:0
+[ 1327907ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4175/api/notifications/stream?token=fake-token:0
