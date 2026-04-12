@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -71,5 +72,21 @@ public class AuthController {
         Long userId = SecurityUtil.getCurrentUserId();
         User user = userService.findById(userId);
         return ResponseEntity.ok(UserDto.from(user));
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<Void> changePassword(@RequestBody Map<String, String> body) {
+        Long userId = SecurityUtil.getCurrentUserId();
+        User user = userService.findById(userId);
+        String currentPassword = body.get("currentPassword");
+        String newPassword = body.get("newPassword");
+        if (currentPassword == null || newPassword == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (!userService.checkPassword(user, currentPassword)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        userService.updatePassword(user, newPassword);
+        return ResponseEntity.noContent().build();
     }
 }

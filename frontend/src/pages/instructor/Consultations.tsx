@@ -433,53 +433,87 @@ export default function Consultations() {
             </svg>
           </div>
         ) : briefingData ? (
-          <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">학생 요약</h4>
-              <p className="text-sm text-slate-700 leading-relaxed">{briefingData.studentSummary}</p>
-            </div>
+          (() => {
+            const hasContent =
+              briefingData.studentSummary ||
+              (briefingData.riskAreas && briefingData.riskAreas.length > 0) ||
+              (briefingData.suggestedTopics && briefingData.suggestedTopics.length > 0) ||
+              (briefingData.actionHistory && briefingData.actionHistory.length > 0);
 
-            {briefingData.riskAreas.length > 0 && (
-              <div className="p-4 rounded-xl bg-rose-50 border border-rose-100">
-                <h4 className="text-xs font-semibold text-rose-700 uppercase tracking-wider mb-2">위험 영역</h4>
-                <div className="flex flex-wrap gap-1.5">
-                  {briefingData.riskAreas.map((area) => (
-                    <TagChip key={area} label={area} color="rose" size="sm" />
-                  ))}
+            if (!hasContent) {
+              return (
+                <div className="flex flex-col items-center justify-center py-10 text-center">
+                  <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+                    <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-medium text-slate-600">AI 브리핑이 아직 생성되지 않았습니다</p>
+                  <p className="text-xs text-slate-400 mt-1">상담 전 AI가 학생 데이터를 분석하여 브리핑을 준비합니다.</p>
                 </div>
-              </div>
-            )}
+              );
+            }
 
-            {briefingData.suggestedTopics.length > 0 && (
-              <div className="p-4 rounded-xl bg-indigo-50 border border-indigo-200">
-                <h4 className="text-xs font-semibold text-indigo-700 uppercase tracking-wider mb-2">추천 상담 주제</h4>
-                <ul className="space-y-1.5">
-                  {briefingData.suggestedTopics.map((topic, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 flex-shrink-0" />
-                      {topic}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            return (
+              <div className="space-y-4">
+                {briefingData.studentSummary && (
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                    <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">학생 요약</h4>
+                    <p className="text-sm text-slate-700 leading-relaxed">{briefingData.studentSummary}</p>
+                  </div>
+                )}
 
-            {briefingData.actionHistory.length > 0 && (
-              <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
-                <h4 className="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-2">이전 액션 히스토리</h4>
-                <ul className="space-y-1.5">
-                  {briefingData.actionHistory.map((action, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
-                      {action}
-                    </li>
-                  ))}
-                </ul>
+                {briefingData.riskAreas && briefingData.riskAreas.length > 0 && (
+                  <div className="p-4 rounded-xl bg-rose-50 border border-rose-100">
+                    <h4 className="text-xs font-semibold text-rose-700 uppercase tracking-wider mb-2">위험 영역</h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {briefingData.riskAreas.map((area) => (
+                        <TagChip key={area} label={area} color="rose" size="sm" />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {briefingData.suggestedTopics && briefingData.suggestedTopics.length > 0 && (
+                  <div className="p-4 rounded-xl bg-indigo-50 border border-indigo-200">
+                    <h4 className="text-xs font-semibold text-indigo-700 uppercase tracking-wider mb-2">추천 상담 주제</h4>
+                    <ul className="space-y-1.5">
+                      {briefingData.suggestedTopics.map((topic, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 flex-shrink-0" />
+                          {topic}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {briefingData.actionHistory && briefingData.actionHistory.length > 0 && (
+                  <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
+                    <h4 className="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-2">이전 액션 히스토리</h4>
+                    <ul className="space-y-1.5">
+                      {briefingData.actionHistory.map((action, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                          {action}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            );
+          })()
         ) : (
-          <p className="text-sm text-slate-400 text-center py-8">브리핑 데이터를 불러올 수 없습니다.</p>
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+              <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p className="text-sm font-medium text-slate-600">AI 브리핑이 아직 생성되지 않았습니다</p>
+            <p className="text-xs text-slate-400 mt-1">상담 전 AI가 학생 데이터를 분석하여 브리핑을 준비합니다.</p>
+          </div>
         )}
       </Modal>
 

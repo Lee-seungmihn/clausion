@@ -61,4 +61,10 @@ public class UserService {
     public boolean checkPassword(User user, String rawPassword) {
         return passwordEncoder.matches(rawPassword, user.getPasswordHash());
     }
+
+    @Transactional
+    public void updatePassword(User user, String newRawPassword) {
+        user.setPasswordHash(passwordEncoder.encode(newRawPassword));
+        userRepository.save(user);
+    }
 }

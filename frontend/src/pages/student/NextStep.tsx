@@ -264,11 +264,43 @@ const NextStep: React.FC = () => {
           })}
 
           {filtered.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-sm text-slate-400">
-                해당 유형의 추천이 없습니다
-              </p>
-            </div>
+            filter === 'all' ? (
+              <div className="rounded-2xl bg-white border border-slate-100 p-8 text-center space-y-4">
+                <div className="w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center mx-auto">
+                  <svg className="w-7 h-7 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.347.346a3.5 3.5 0 01-4.95 0l-.347-.346z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800 mb-1">아직 추천이 없습니다</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    AI가 학습 데이터를 분석하여 맞춤 학습 경로를 추천합니다.
+                  </p>
+                </div>
+                <div className="rounded-xl bg-slate-50 border border-slate-100 p-4 text-left space-y-2">
+                  <p className="text-xs font-semibold text-slate-600 mb-2">추천이 비어 있는 이유</p>
+                  <div className="flex items-start gap-2 text-xs text-slate-500">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                    수강 중인 과정이 없거나, 학습 데이터가 충분히 쌓이지 않았습니다.
+                  </div>
+                  <p className="text-xs font-semibold text-slate-600 mt-3 mb-2">추천을 받으려면</p>
+                  <div className="flex items-start gap-2 text-xs text-slate-500">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 flex-shrink-0" />
+                    과정을 수강하고, 복습과 성찰을 작성하면 추천이 시작됩니다.
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigate('/student/courses')}
+                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition-colors"
+                >
+                  과정 둘러보기
+                </button>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-sm text-slate-400">해당 유형의 추천이 없습니다</p>
+              </div>
+            )
           )}
         </div>
       </main>

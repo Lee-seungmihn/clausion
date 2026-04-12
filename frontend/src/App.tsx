@@ -7,6 +7,8 @@ import AppShell from './components/layout/AppShell';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import OperatorLogin from './pages/OperatorLogin';
+import Profile from './pages/Profile';
 
 // Student Pages
 import StudentDashboard from './pages/student/Dashboard';
@@ -74,6 +76,7 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/operator/login" element={<OperatorLogin />} />
 
           {/* Student routes */}
           <Route
@@ -94,6 +97,7 @@ export default function App() {
             <Route path="consultation/:id" element={<StudentConsultation />} />
             <Route path="consultation/:consultationId/video" element={<StudentVideoCall />} />
             <Route path="next-step" element={<StudentNextStep />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
 
           {/* Instructor routes */}
@@ -115,6 +119,7 @@ export default function App() {
             <Route path="consultations" element={<InstructorConsultations />} />
             <Route path="consultation/:id" element={<InstructorConsultations />} />
             <Route path="consultation/:consultationId/video" element={<InstructorVideoCall />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
 
           {/* Operator routes */}
@@ -135,6 +140,7 @@ export default function App() {
             <Route path="reports" element={<OperationReports />} />
             <Route path="simulation" element={<WhatIfSimulation />} />
             <Route path="audit" element={<AuditLog />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
 
           {/* Catch-all */}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import IncomingCallModal from '../consultation/IncomingCallModal';
 import ChatbotFloatingButton from '../chatbot/ChatbotFloatingButton';
@@ -20,6 +20,8 @@ interface CallInfo {
 
 export default function AppShell({ role }: AppShellProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isStudentDashboard = role === 'student' && (location.pathname === '/student' || location.pathname === '/student/');
   const { user } = useAuthStore();
   const { notifications } = useNotifications();
   const [incomingCall, setIncomingCall] = useState<CallInfo | null>(null);
@@ -75,8 +77,8 @@ export default function AppShell({ role }: AppShellProps) {
             onAccept={handleAccept}
             onReject={handleReject}
           />
-          <ChatbotFloatingButton />
-          <ChatbotModal />
+          {!isStudentDashboard && <ChatbotFloatingButton />}
+          {!isStudentDashboard && <ChatbotModal />}
         </>
       )}
     </div>
