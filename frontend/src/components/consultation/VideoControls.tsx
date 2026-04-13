@@ -4,20 +4,16 @@ interface VideoControlsProps {
   onEndCall?: () => void;
   micOn?: boolean;
   camOn?: boolean;
-  screenShareOn?: boolean;
   onToggleMic?: () => void;
   onToggleCamera?: () => void;
-  onToggleScreenShare?: () => void;
 }
 
 export default function VideoControls({
   onEndCall,
   micOn: externalMicOn,
   camOn: externalCamOn,
-  screenShareOn,
   onToggleMic,
   onToggleCamera,
-  onToggleScreenShare,
 }: VideoControlsProps) {
   // Use internal state as fallback when no external control is provided
   const [internalMicOn, setInternalMicOn] = useState(true);
@@ -96,30 +92,6 @@ export default function VideoControls({
           </svg>
         )}
       </button>
-
-      {/* Screen Share Toggle */}
-      {onToggleScreenShare && (
-        <button
-          onClick={onToggleScreenShare}
-          className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-            screenShareOn
-              ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-              : 'bg-slate-700 text-white hover:bg-slate-600'
-          }`}
-          aria-label={screenShareOn ? '화면 공유 중지' : '화면 공유'}
-        >
-          {screenShareOn ? (
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              <line x1="1" y1="1" x2="23" y2="23" strokeWidth={2.5} />
-            </svg>
-          ) : (
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-          )}
-        </button>
-      )}
 
       {/* End Call */}
       <button
