@@ -19,12 +19,16 @@ interface UseLiveKitReturn {
   isConnecting: boolean;
   localVideoRef: React.RefObject<HTMLVideoElement | null>;
   remoteVideoRef: React.RefObject<HTMLVideoElement | null>;
+  screenShareRef: React.RefObject<HTMLVideoElement | null>;
   isMicEnabled: boolean;
   isCameraEnabled: boolean;
+  isScreenSharing: boolean;
+  isRemoteScreenSharing: boolean;
   connect: (token?: string, roomName?: string) => Promise<void>;
   disconnect: () => void;
   toggleMic: () => void;
   toggleCamera: () => void;
+  toggleScreenShare: () => void;
   error: string | null;
 }
 
@@ -36,10 +40,13 @@ export function useLiveKit({
   const [isConnecting, setIsConnecting] = useState(false);
   const [isMicEnabled, setIsMicEnabled] = useState(true);
   const [isCameraEnabled, setIsCameraEnabled] = useState(true);
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const [isRemoteScreenSharing, setIsRemoteScreenSharing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
+  const screenShareRef = useRef<HTMLVideoElement | null>(null);
   const roomRef = useRef<Room | null>(null);
   const audioElementsRef = useRef<HTMLElement[]>([]);
   const isConnectedRef = useRef(false);
@@ -115,22 +122,41 @@ export function useLiveKit({
         // Remote participant events - fires when a remote track becomes available
         room.on(
           RoomEvent.TrackSubscribed,
-          (track, _publication, _participant) => {
-            console.log('[LiveKit] TrackSubscribed:', track.kind, track.sid);
-            if (track.kind === Track.Kind.Video && remoteVideoRef.current) {
-              track.attach(remoteVideoRef.current);
+          (track, publication, _participant) => {
+            console.log('[LiveKit] TrackSubscribed:', track.kind, track.source, track.sid);
+            if (track.kind === Track.Kind.Video) {
+              if (publication.source === Track.Source.ScreenShare) {
+                // Remote screen share → attach to screenShareRef
+                if (screenShareRef.current) {
+                  track.attach(screenShareRef.current);
+                }
+                setIsRemoteScreenSharing(true);
+              } else if (remoteVideoRef.current) {
+                track.attach(remoteVideoRef.current);
+              }
             }
             attachAudioTrack(track);
           },
         );
 
-        room.on(RoomEvent.TrackUnsubscribed, (track) => {
-          console.log('[LiveKit] TrackUnsubscribed:', track.kind, track.sid);
+        room.on(RoomEvent.TrackUnsubscribed, (track, publication) => {
+          console.log('[LiveKit] TrackUnsubscribed:', track.kind, track.source, track.sid);
+          if (publication?.source === Track.Source.ScreenShare) {
+            setIsRemoteScreenSharing(false);
+          }
           const detachedElements = track.detach();
           detachedElements.forEach((el) => {
             el.remove();
             audioElementsRef.current = audioElementsRef.current.filter((a) => a !== el);
           });
+        });
+
+        // Handle local screen share being stopped (e.g. user clicks browser's "Stop sharing")
+        room.on(RoomEvent.LocalTrackUnpublished, (publication) => {
+          if (publication.source === Track.Source.ScreenShare) {
+            console.log('[LiveKit] Local screen share ended');
+            setIsScreenSharing(false);
+          }
         });
 
         room.on(RoomEvent.Disconnected, () => {
@@ -240,6 +266,28 @@ export function useLiveKit({
     setIsCameraEnabled(next);
   }, [isCameraEnabled]);
 
+  const toggleScreenShare = useCallback(async () => {
+    if (!roomRef.current) return;
+    const next = !isScreenSharing;
+    try {
+      await roomRef.current.localParticipant.setScreenShareEnabled(next);
+      setIsScreenSharing(next);
+
+      if (next) {
+        // Attach local screen share track to screenShareRef for preview
+        const screenPubs = roomRef.current.localParticipant.trackPublications;
+        screenPubs.forEach((pub: LocalTrackPublication) => {
+          if (pub.source === Track.Source.ScreenShare && pub.track && screenShareRef.current) {
+            pub.track.attach(screenShareRef.current);
+          }
+        });
+      }
+    } catch {
+      // User cancelled the screen share dialog
+      setIsScreenSharing(false);
+    }
+  }, [isScreenSharing]);
+
   useEffect(() => {
     return () => {
       if (roomRef.current) {
@@ -255,12 +303,16 @@ export function useLiveKit({
     isConnecting,
     localVideoRef,
     remoteVideoRef,
+    screenShareRef,
     isMicEnabled,
     isCameraEnabled,
+    isScreenSharing,
+    isRemoteScreenSharing,
     connect,
     disconnect,
     toggleMic,
     toggleCamera,
+    toggleScreenShare,
     error,
   };
 }
