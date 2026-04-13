@@ -44,8 +44,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // WebSocket endpoint (auth via ?token= query param in JwtFilter)
                         .requestMatchers("/ws-chat/**").permitAll()
-                        // Health check & error
+                        // Health check, error & seed
                         .requestMatchers("/actuator/health", "/error").permitAll()
+                        .requestMatchers("/api/seed/**").permitAll()
                         // Instructor endpoints
                         .requestMatchers("/api/instructor/**").hasRole("INSTRUCTOR")
                         // Operator endpoints
