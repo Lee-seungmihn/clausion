@@ -1,4 +1,4 @@
-import { useRouteError, isRouteErrorResponse, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Component, type ReactNode, type ErrorInfo } from 'react';
 
 function ErrorDisplay({ status, title, message, stack }: { status?: number; title: string; message: string; stack?: string }) {
@@ -63,27 +63,13 @@ function ErrorDisplay({ status, title, message, stack }: { status?: number; titl
   );
 }
 
-/** React Router errorElement - catches route-level errors */
+/** 404 Not Found page - used as catch-all route element */
 export default function ErrorPage() {
-  const error = useRouteError();
-
-  if (isRouteErrorResponse(error)) {
-    return (
-      <ErrorDisplay
-        status={error.status}
-        title={error.status === 404 ? '페이지를 찾을 수 없습니다' : '오류가 발생했습니다'}
-        message={error.statusText || '요청한 페이지가 존재하지 않거나 접근할 수 없습니다.'}
-      />
-    );
-  }
-
-  const err = error instanceof Error ? error : new Error(String(error));
-
   return (
     <ErrorDisplay
-      title="예상치 못한 오류가 발생했습니다"
-      message={err.message}
-      stack={err.stack}
+      status={404}
+      title="페이지를 찾을 수 없습니다"
+      message="요청한 페이지가 존재하지 않거나 접근할 수 없습니다."
     />
   );
 }
