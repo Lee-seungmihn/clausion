@@ -80,21 +80,22 @@ public class OperatorCourseController {
 
     @Transactional
     @PutMapping("/{id}/reject")
-    public ResponseEntity<Void> rejectCourse(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<Void> rejectCourse(@PathVariable Long id, @RequestBody(required = false) Map<String, String> body) {
         Course c = courseRepository.findById(id).orElse(null);
         if (c == null) return ResponseEntity.notFound().build();
 
+        String note = body != null ? body.get("note") : null;
         c.setApprovalStatus("REJECTED");
-        c.setApprovalNote(body.get("note"));
+        c.setApprovalNote(note);
         courseRepository.save(c);
         notifyInstructor(
                 c,
                 "COURSE_REJECTED",
                 "과정 반려",
-                c.getTitle() + " 과정이 반려되었습니다." + (body.get("note") != null && !body.get("note").isBlank() ? " 사유: " + body.get("note") : "")
+                c.getTitle() + " 과정이 반려되었습니다." + (note != null && !note.isBlank() ? " 사유: " + note : "")
         );
 
-        logAudit("COURSE_REJECT", "COURSE", id, Map.of("note", body.getOrDefault("note", "")));
+        logAudit("COURSE_REJECT", "COURSE", id, Map.of("note", note != null ? note : ""));
         return ResponseEntity.noContent().build();
     }
 
