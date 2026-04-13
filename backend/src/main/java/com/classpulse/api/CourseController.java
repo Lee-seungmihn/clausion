@@ -84,6 +84,7 @@ public class CourseController {
     }
 
     @GetMapping
+    @Transactional(readOnly = true)
     public ResponseEntity<List<CourseResponse>> list() {
         Long userId = SecurityUtil.getCurrentUserId();
         User currentUser = userService.findById(userId);
@@ -105,6 +106,7 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
+    @Transactional(readOnly = true)
     public ResponseEntity<CourseResponse> getById(@PathVariable Long id) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Course not found: " + id));
@@ -113,6 +115,7 @@ public class CourseController {
     }
 
     @GetMapping("/my-enrollments")
+    @Transactional(readOnly = true)
     public ResponseEntity<List<EnrollResponse>> myEnrollments() {
         Long userId = SecurityUtil.getCurrentUserId();
         List<CourseEnrollment> enrollments = enrollmentRepository.findByStudentId(userId);
