@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { instructorApi } from '../../api/instructor';
 import GlassCard from '../../components/common/GlassCard';
 
 export default function AttendanceManagement() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
@@ -11,7 +13,7 @@ export default function AttendanceManagement() {
   const [newSessionDate, setNewSessionDate] = useState(new Date().toISOString().slice(0, 10));
   const [newSessionTitle, setNewSessionTitle] = useState('');
 
-  const { data: courses } = useQuery({
+  const { data: courses, isLoading: coursesLoading, isError: coursesError } = useQuery({
     queryKey: ['instructor', 'attendance', 'courses'],
     queryFn: instructorApi.getAttendanceCourses,
   });
@@ -247,7 +249,33 @@ export default function AttendanceManagement() {
         </div>
       )}
 
-      {!selectedCourseId && (
+      {coursesLoading && (
+        <GlassCard className="p-8 text-center">
+          <p className="text-slate-400">과정 목록을 불러오는 중...</p>
+        </GlassCard>
+      )}
+
+      {coursesError && (
+        <GlassCard className="p-8 text-center">
+          <p className="text-rose-600 font-medium mb-2">과정 목록을 불러올 수 없습니다.</p>
+          <p className="text-sm text-slate-500">네트워크 연결을 확인하거나 다시 시도해주세요.</p>
+        </GlassCard>
+      )}
+
+      {!coursesLoading && !coursesError && courses && courses.length === 0 && (
+        <GlassCard className="p-8 text-center">
+          <p className="text-slate-600 font-medium mb-2">등록된 과정이 없습니다.</p>
+          <p className="text-sm text-slate-400 mb-4">과정을 먼저 생성한 후 출결 관리를 시작하세요.</p>
+          <button
+            onClick={() => navigate('/instructor/courses/new')}
+            className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition-colors"
+          >
+            과정 생성하기
+          </button>
+        </GlassCard>
+      )}
+
+      {!selectedCourseId && courses && courses.length > 0 && (
         <GlassCard className="p-8 text-center">
           <p className="text-slate-400">과정을 선택하면 출결 관리를 시작할 수 있습니다.</p>
         </GlassCard>
