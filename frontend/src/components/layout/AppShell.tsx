@@ -58,11 +58,13 @@ export default function AppShell({ role }: AppShellProps) {
           callerName: String(data.callerName),
           courseName: latest.message,
         });
+        // Mark as read so the modal doesn't reappear on refresh
+        if (latest.id) markAsRead(latest.id);
       } catch {
         // skip malformed notification — don't mark as handled
       }
     }
-  }, [notifications, role]);
+  }, [notifications, role, markAsRead]);
 
   // Show toast notifications for newly arrived actionable events across roles.
   useEffect(() => {
