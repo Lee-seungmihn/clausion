@@ -10,7 +10,7 @@ COPY gradle ./gradle
 # Download dependencies (cached layer)
 RUN gradle dependencies --no-daemon || true
 
-# Force no-cache: v6
+# Force no-cache: v7
 COPY src ./src
 RUN gradle bootJar --no-daemon -x test && ls -la build/libs/
 

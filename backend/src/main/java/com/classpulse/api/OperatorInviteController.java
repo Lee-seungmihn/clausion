@@ -18,6 +18,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/operator/invite-codes")
 @RequiredArgsConstructor
+@Transactional
 public class OperatorInviteController {
 
     private final RegistrationCodeRepository registrationCodeRepository;
