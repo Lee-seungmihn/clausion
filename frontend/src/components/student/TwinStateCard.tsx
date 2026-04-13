@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import SVGRadarChart from '../common/SVGRadarChart';
 import { useStudentTwin } from '../../hooks/useStudentTwin';
 import { useAuthStore } from '../../store/authStore';
+import { useCourseId } from '../../hooks/useCourseId';
 import type { RadarChartData } from '../../types';
 
 const EMPTY_RADAR: RadarChartData = {
@@ -38,7 +39,8 @@ function riskLevel(score: number): {
 const TwinStateCard: React.FC = () => {
   const { user } = useAuthStore();
   const studentId = user?.id?.toString() ?? '';
-  const { data: twin } = useStudentTwin(studentId);
+  const courseId = useCourseId();
+  const { data: twin } = useStudentTwin(studentId, courseId);
 
   const hasTwinData = twin && twin.masteryScore != null;
   const radar: RadarChartData = hasTwinData

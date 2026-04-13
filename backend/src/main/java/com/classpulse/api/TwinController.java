@@ -87,8 +87,13 @@ public class TwinController {
     // --- Endpoints ---
 
     @GetMapping("/{studentId}")
-    public ResponseEntity<List<TwinResponse>> getTwin(@PathVariable Long studentId) {
+    public ResponseEntity<List<TwinResponse>> getTwin(
+            @PathVariable Long studentId,
+            @RequestParam(required = false) Long courseId) {
         List<StudentTwin> twins = twinService.getStudentTwins(studentId);
+        if (courseId != null) {
+            twins = twins.stream().filter(t -> t.getCourse().getId().equals(courseId)).toList();
+        }
         return ResponseEntity.ok(twins.stream().map(TwinResponse::from).toList());
     }
 

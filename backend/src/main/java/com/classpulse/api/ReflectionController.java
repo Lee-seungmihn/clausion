@@ -92,8 +92,15 @@ public class ReflectionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ReflectionResponse>> list(@RequestParam Long studentId) {
-        List<Reflection> reflections = reflectionRepository.findByStudentIdOrderByCreatedAtDesc(studentId);
+    public ResponseEntity<List<ReflectionResponse>> list(
+            @RequestParam Long studentId,
+            @RequestParam(required = false) Long courseId) {
+        List<Reflection> reflections;
+        if (courseId != null) {
+            reflections = reflectionRepository.findByStudentIdAndCourseIdOrderByCreatedAtDesc(studentId, courseId);
+        } else {
+            reflections = reflectionRepository.findByStudentIdOrderByCreatedAtDesc(studentId);
+        }
         return ResponseEntity.ok(reflections.stream().map(ReflectionResponse::from).toList());
     }
 

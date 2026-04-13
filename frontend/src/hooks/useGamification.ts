@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { gamificationApi } from '../api/gamification';
 import type { GamificationState, Badge } from '../types';
 
-export function useGamification(studentId: string) {
+export function useGamification(studentId: string, courseId?: string) {
   return useQuery<GamificationState>({
-    queryKey: ['gamification', studentId],
-    queryFn: () => gamificationApi.getGamificationState(studentId),
+    queryKey: ['gamification', studentId, courseId],
+    queryFn: () => gamificationApi.getGamificationState(studentId, courseId),
     enabled: !!studentId,
     staleTime: 60_000,
     retry: false,

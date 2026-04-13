@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { reviewsApi } from '../../api/reviews';
+import { useCourseId } from '../../hooks/useCourseId';
 import type { ReviewTask } from '../../types';
 
 const REASON_BADGE: Record<string, { label: string; color: string }> = {
@@ -22,16 +23,17 @@ function getReasonBadge(reason: string) {
 
 const TodayActionPanel: React.FC = () => {
   const queryClient = useQueryClient();
+  const courseId = useCourseId();
 
   const { data: tasks, isLoading } = useQuery<ReviewTask[]>({
-    queryKey: ['reviewsToday'],
-    queryFn: () => reviewsApi.getTodayReviews(),
+    queryKey: ['reviewsToday', courseId],
+    queryFn: () => reviewsApi.getTodayReviews(courseId),
   });
 
   const completeMutation = useMutation({
     mutationFn: (reviewId: string) => reviewsApi.completeReview(reviewId),
     onMutate: async (reviewId) => {
-      await queryClient.cancelQueries({ queryKey: ['reviewsToday'] });
+      await queryClient.cancelQueries({ queryKey: ['reviewsToday', courseId] });
       const previous = queryClient.getQueryData<ReviewTask[]>(['reviewsToday']);
       queryClient.setQueryData<ReviewTask[]>(['reviewsToday'], (old) =>
         old?.map((t) =>
@@ -48,7 +50,7 @@ const TodayActionPanel: React.FC = () => {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['reviewsToday'] });
+      queryClient.invalidateQueries({ queryKey: ['reviewsToday', courseId] });
     },
   });
 

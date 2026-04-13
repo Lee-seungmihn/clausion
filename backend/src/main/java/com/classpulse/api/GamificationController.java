@@ -76,12 +76,18 @@ public class GamificationController {
     // --- Endpoints ---
 
     @GetMapping("/{studentId}")
-    public ResponseEntity<List<GamificationResponse>> getGamification(@PathVariable Long studentId) {
-        // Return all course gamification states for this student
-        // GamificationRepository extends JpaRepository<StudentGamification> so findAll filtered by student
-        List<StudentGamification> all = gamificationRepository.findAll().stream()
-                .filter(g -> g.getStudent().getId().equals(studentId))
-                .toList();
+    public ResponseEntity<List<GamificationResponse>> getGamification(
+            @PathVariable Long studentId,
+            @RequestParam(required = false) Long courseId) {
+        List<StudentGamification> all;
+        if (courseId != null) {
+            all = gamificationRepository.findByStudentIdAndCourseId(studentId, courseId)
+                    .map(List::of).orElse(List.of());
+        } else {
+            all = gamificationRepository.findAll().stream()
+                    .filter(g -> g.getStudent().getId().equals(studentId))
+                    .toList();
+        }
         return ResponseEntity.ok(all.stream().map(GamificationResponse::from).toList());
     }
 

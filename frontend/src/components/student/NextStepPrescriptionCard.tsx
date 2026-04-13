@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { recommendationsApi } from '../../api/recommendations';
 import { useAuthStore } from '../../store/authStore';
+import { useCourseId } from '../../hooks/useCourseId';
 import type { Recommendation } from '../../types';
 import { getRecommendationAction } from '../../utils/recommendations';
 
@@ -17,9 +18,10 @@ const NextStepPrescriptionCard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const studentId = user?.id?.toString() ?? '';
+  const courseId = useCourseId();
   const { data: recs } = useQuery<Recommendation[]>({
-    queryKey: ['recommendations', studentId],
-    queryFn: () => recommendationsApi.getRecommendations(studentId),
+    queryKey: ['recommendations', studentId, courseId],
+    queryFn: () => recommendationsApi.getRecommendations(studentId, courseId),
     enabled: !!studentId,
   });
 

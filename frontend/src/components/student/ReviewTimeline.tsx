@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { reviewsApi } from '../../api/reviews';
+import { useCourseId } from '../../hooks/useCourseId';
 import type { WeekDaySummary } from '../../api/reviews';
 
 type DayStatus = 'completed' | 'partial' | 'missed' | 'today' | 'future';
@@ -63,9 +64,10 @@ const PLACEHOLDER: WeekDaySummary[] = Array.from({ length: 7 }, (_, i) => {
 });
 
 const ReviewTimeline: React.FC = () => {
+  const courseId = useCourseId();
   const { data: week = PLACEHOLDER } = useQuery<WeekDaySummary[]>({
-    queryKey: ['reviewWeekSummary'],
-    queryFn: () => reviewsApi.getWeekSummary(),
+    queryKey: ['reviewWeekSummary', courseId],
+    queryFn: () => reviewsApi.getWeekSummary(courseId),
   });
 
   const totalCompleted = week.reduce((s, d) => s + d.completed, 0);

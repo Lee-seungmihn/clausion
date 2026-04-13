@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { reviewsApi } from '../../api/reviews';
 import ReviewTimeline from '../../components/student/ReviewTimeline';
+import { useCourseId } from '../../hooks/useCourseId';
 import type { ReviewTask } from '../../types';
 
 type FilterStatus = 'all' | 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'SKIPPED';
@@ -17,18 +18,19 @@ const STATUS_BADGE: Record<string, { label: string; color: string }> = {
 const Review: React.FC = () => {
   const [filter, setFilter] = useState<FilterStatus>('all');
   const queryClient = useQueryClient();
+  const courseId = useCourseId();
 
   const { data: tasks = [] } = useQuery<ReviewTask[]>({
-    queryKey: ['reviewsToday'],
-    queryFn: () => reviewsApi.getTodayReviews(),
+    queryKey: ['reviewsToday', courseId],
+    queryFn: () => reviewsApi.getTodayReviews(courseId),
   });
 
   const completeMutation = useMutation({
     mutationFn: (reviewId: string) => reviewsApi.completeReview(reviewId),
     onMutate: async (reviewId) => {
-      await queryClient.cancelQueries({ queryKey: ['reviewsToday'] });
-      const previous = queryClient.getQueryData<ReviewTask[]>(['reviewsToday']);
-      queryClient.setQueryData<ReviewTask[]>(['reviewsToday'], (old) =>
+      await queryClient.cancelQueries({ queryKey: ['reviewsToday', courseId] });
+      const previous = queryClient.getQueryData<ReviewTask[]>(['reviewsToday', courseId]);
+      queryClient.setQueryData<ReviewTask[]>(['reviewsToday', courseId], (old) =>
         old?.map((t) =>
           String(t.id) === String(reviewId)
             ? { ...t, status: 'COMPLETED' as const, completedAt: new Date().toISOString() }
@@ -39,11 +41,11 @@ const Review: React.FC = () => {
     },
     onError: (_err, _id, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(['reviewsToday'], context.previous);
+        queryClient.setQueryData(['reviewsToday', courseId], context.previous);
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['reviewsToday'] });
+      queryClient.invalidateQueries({ queryKey: ['reviewsToday', courseId] });
     },
   });
 

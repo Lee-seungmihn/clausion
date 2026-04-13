@@ -10,8 +10,9 @@ export interface WeekDaySummary {
 }
 
 export const reviewsApi = {
-  getTodayReviews(): Promise<ReviewTask[]> {
-    return api.get<ReviewTask[]>('/api/reviews/today');
+  getTodayReviews(courseId?: string): Promise<ReviewTask[]> {
+    const params = courseId ? `?courseId=${courseId}` : '';
+    return api.get<ReviewTask[]>(`/api/reviews/today${params}`);
   },
 
   completeReview(reviewId: string): Promise<ReviewTask> {
@@ -22,7 +23,8 @@ export const reviewsApi = {
     return api.get<ReviewTask[]>(`/api/reviews/by-student?studentId=${studentId}&courseId=${courseId}`);
   },
 
-  getWeekSummary(): Promise<WeekDaySummary[]> {
-    return api.get<WeekDaySummary[]>('/api/reviews/week-summary');
+  getWeekSummary(courseId?: string): Promise<WeekDaySummary[]> {
+    const params = courseId ? `?courseId=${courseId}` : '';
+    return api.get<WeekDaySummary[]>(`/api/reviews/week-summary${params}`);
   },
 };

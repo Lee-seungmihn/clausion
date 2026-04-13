@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { reflectionsApi } from '../../api/reflections';
 import { useAuthStore } from '../../store/authStore';
+import { useCourseId } from '../../hooks/useCourseId';
 import type { Reflection } from '../../types';
 
 function renderStars(score: number) {
@@ -42,10 +43,11 @@ const ReflectionTimeline: React.FC<ReflectionTimelineProps> = ({
 }) => {
   const { user } = useAuthStore();
   const studentId = studentIdProp ?? user?.id?.toString() ?? '';
+  const courseId = useCourseId();
 
   const { data: reflections } = useQuery<Reflection[]>({
-    queryKey: ['reflections', studentId],
-    queryFn: () => reflectionsApi.getReflections(studentId),
+    queryKey: ['reflections', studentId, courseId],
+    queryFn: () => reflectionsApi.getReflections(studentId, courseId),
     enabled: !!studentId,
   });
 

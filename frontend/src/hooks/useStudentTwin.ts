@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { twinApi } from '../api/twin';
 import type { StudentTwin, SkillMasterySnapshot } from '../types';
 
-export function useStudentTwin(studentId: string) {
+export function useStudentTwin(studentId: string, courseId?: string) {
   return useQuery<StudentTwin | null>({
-    queryKey: ['studentTwin', studentId],
-    queryFn: () => twinApi.getStudentTwin(studentId),
+    queryKey: ['studentTwin', studentId, courseId],
+    queryFn: () => twinApi.getStudentTwin(studentId, courseId),
     enabled: !!studentId,
     staleTime: 30_000,
   });

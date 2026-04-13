@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useGamification } from '../../hooks/useGamification';
 import { useAuthStore } from '../../store/authStore';
+import { useCourseId } from '../../hooks/useCourseId';
 import type { GamificationState } from '../../types';
 
 const DEFAULT_STATE: GamificationState = {
@@ -16,7 +17,8 @@ const DEFAULT_STATE: GamificationState = {
 const GamificationBar: React.FC = () => {
   const { user } = useAuthStore();
   const studentId = user?.id?.toString() ?? '';
-  const { data } = useGamification(studentId);
+  const courseId = useCourseId();
+  const { data } = useGamification(studentId, courseId);
   const state = data && data.currentXP != null ? data : DEFAULT_STATE;
 
   const xpPercent = state.nextLevelXP > 0

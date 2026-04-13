@@ -154,7 +154,9 @@ public class ConsultationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ConsultationResponse>> list(@RequestParam String role) {
+    public ResponseEntity<List<ConsultationResponse>> list(
+            @RequestParam String role,
+            @RequestParam(required = false) Long courseId) {
         Long userId = SecurityUtil.getCurrentUserId();
         List<Consultation> consultations;
 
@@ -162,6 +164,12 @@ public class ConsultationController {
             consultations = consultationService.getByInstructorId(userId);
         } else {
             consultations = consultationService.getByStudentId(userId);
+        }
+
+        if (courseId != null) {
+            consultations = consultations.stream()
+                    .filter(c -> c.getCourse().getId().equals(courseId))
+                    .toList();
         }
 
         return ResponseEntity.ok(consultations.stream().map(ConsultationResponse::from).toList());

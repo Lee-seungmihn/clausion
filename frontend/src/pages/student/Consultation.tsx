@@ -44,8 +44,8 @@ const ConsultationPage: React.FC = () => {
   const [requestReason, setRequestReason] = useState('');
 
   const { data: consultations, isLoading } = useQuery<Consultation[]>({
-    queryKey: ['consultations', 'student'],
-    queryFn: () => consultationsApi.getConsultations('student'),
+    queryKey: ['consultations', 'student', courseId],
+    queryFn: () => consultationsApi.getConsultations('student', courseId),
   });
 
   const requestMutation = useMutation({

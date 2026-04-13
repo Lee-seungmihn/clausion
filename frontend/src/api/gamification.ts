@@ -18,8 +18,9 @@ interface BackendGamificationResponse {
 
 export const gamificationApi = {
   // Backend returns List<GamificationResponse>, we map first element to GamificationState
-  async getGamificationState(studentId: string): Promise<GamificationState> {
-    const list = await api.get<BackendGamificationResponse[]>(`/api/gamification/${studentId}`);
+  async getGamificationState(studentId: string, courseId?: string): Promise<GamificationState> {
+    const params = courseId ? `?courseId=${courseId}` : '';
+    const list = await api.get<BackendGamificationResponse[]>(`/api/gamification/${studentId}${params}`);
     const g = list[0];
     if (!g) {
       return { level: 1, currentXP: 0, nextLevelXP: 100, levelTitle: '', streakDays: 0, badges: [] };

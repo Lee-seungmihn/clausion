@@ -34,13 +34,13 @@ const Reflection: React.FC = () => {
   // Fetch Twin data for AI sidebar (replaces hardcoded constants)
   const { data: twin } = useQuery({
     queryKey: ['twin', studentId, courseId],
-    queryFn: () => twinApi.getStudentTwin(studentId),
+    queryFn: () => twinApi.getStudentTwin(studentId, courseId),
     enabled: !!studentId,
   });
 
   const { data: prevReflections } = useQuery({
-    queryKey: ['reflections', studentId],
-    queryFn: () => reflectionsApi.getReflections(studentId),
+    queryKey: ['reflections', studentId, courseId],
+    queryFn: () => reflectionsApi.getReflections(studentId, courseId),
     enabled: !!studentId,
   });
 

@@ -3,8 +3,9 @@ import type { StudentTwin, SkillMasterySnapshot } from '../types';
 
 export const twinApi = {
   // Backend returns List<TwinResponse>, we take the first element
-  async getStudentTwin(studentId: string): Promise<StudentTwin> {
-    const list = await api.get<StudentTwin[]>(`/api/twin/${studentId}`);
+  async getStudentTwin(studentId: string, courseId?: string): Promise<StudentTwin> {
+    const params = courseId ? `?courseId=${courseId}` : '';
+    const list = await api.get<StudentTwin[]>(`/api/twin/${studentId}${params}`);
     return list[0] ?? null;
   },
 

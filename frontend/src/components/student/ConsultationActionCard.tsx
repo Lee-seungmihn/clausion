@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { consultationsApi } from '../../api/consultations';
+import { useCourseId } from '../../hooks/useCourseId';
 import type { Consultation, ActionPlan } from '../../types';
 
 
@@ -39,9 +40,10 @@ interface ConsultationActionCardProps {
 const ConsultationActionCard: React.FC<ConsultationActionCardProps> = ({
   role = 'student',
 }) => {
+  const courseId = useCourseId();
   const { data: consultations, isLoading } = useQuery<Consultation[]>({
-    queryKey: ['consultations', role],
-    queryFn: () => consultationsApi.getConsultations(role),
+    queryKey: ['consultations', role, courseId],
+    queryFn: () => consultationsApi.getConsultations(role, courseId),
   });
 
   const list = consultations ?? [];
