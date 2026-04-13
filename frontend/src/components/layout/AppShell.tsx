@@ -115,7 +115,7 @@ export default function AppShell({ role }: AppShellProps) {
       <Sidebar role={role} />
       <main className="flex-1 overflow-y-auto">
         {/* Mobile header bar */}
-        <div className="sticky top-0 z-30 flex items-center gap-3 px-4 py-2 bg-white/80 backdrop-blur border-b border-slate-100 lg:hidden">
+        <div className="sticky top-0 z-40 flex items-center gap-3 px-4 py-2 bg-white/80 backdrop-blur border-b border-slate-100 lg:hidden">
           <button onClick={openMobileSidebar} className="p-1.5 rounded-lg hover:bg-slate-100">
             <svg className="w-5 h-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />

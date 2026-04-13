@@ -97,7 +97,7 @@ const Practice: React.FC = () => {
   if (!courseId) {
     return (
       <div className="min-h-screen bg-slate-50">
-        <header className="sticky top-0 z-30 border-b border-slate-100 bg-white/80 backdrop-blur">
+        <header className="sticky top-[41px] lg:top-0 z-30 border-b border-slate-100 bg-white/80 backdrop-blur">
           <div className="mx-auto max-w-6xl px-6 py-3">
             <h1 className="text-xl font-bold text-slate-900">문제 풀기</h1>
           </div>
@@ -115,7 +115,7 @@ const Practice: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="sticky top-0 z-30 border-b border-slate-100 bg-white/80 backdrop-blur">
+      <header className="sticky top-[41px] lg:top-0 z-30 border-b border-slate-100 bg-white/80 backdrop-blur">
         <div className="mx-auto max-w-7xl px-6 py-3">
           <h1 className="text-xl font-bold text-slate-900">문제 풀기</h1>
           <p className="text-xs text-slate-500">

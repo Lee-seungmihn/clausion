@@ -77,7 +77,7 @@ export default function CourseEnroll() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30">
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-100">
+      <header className="sticky top-[41px] lg:top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-100">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-0">
           <h1 className="text-base font-bold text-slate-800">과정 관리</h1>
           <p className="text-xs text-slate-500 mb-3">내 과정을 확인하거나 새 과정에 수강 신청하세요</p>
