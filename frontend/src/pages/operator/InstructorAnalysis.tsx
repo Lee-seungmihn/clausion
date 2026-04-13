@@ -33,16 +33,17 @@ export default function InstructorAnalysis() {
             {workload && workload.length > 0 ? (
               <div className="space-y-3">
                 {workload.map((inst) => {
-                  const pct = Math.min(inst.workloadScore, 100);
+                  const cap = inst.totalCapacity ?? 1;
+                  const fillPct = cap > 0 ? Math.min(Math.round((inst.studentCount / cap) * 100), 100) : 0;
                   const barColor =
-                    pct >= 90 ? 'bg-rose-500'
-                    : pct >= 70 ? 'bg-orange-400'
-                    : pct >= 50 ? 'bg-amber-400'
-                    : pct >= 30 ? 'bg-sky-400'
+                    fillPct >= 90 ? 'bg-rose-500'
+                    : fillPct >= 70 ? 'bg-orange-400'
+                    : fillPct >= 50 ? 'bg-amber-400'
+                    : fillPct >= 30 ? 'bg-sky-400'
                     : 'bg-emerald-400';
                   const pctColor =
-                    pct >= 90 ? 'text-rose-600'
-                    : pct >= 70 ? 'text-orange-600'
+                    fillPct >= 90 ? 'text-rose-600'
+                    : fillPct >= 70 ? 'text-orange-600'
                     : 'text-slate-500';
                   return (
                     <div key={inst.id} className="flex items-center gap-4">
@@ -52,16 +53,16 @@ export default function InstructorAnalysis() {
                           <div className="flex-1 h-4 bg-slate-100 rounded-full overflow-hidden">
                             <div
                               className={`h-full rounded-full transition-all ${barColor}`}
-                              style={{ width: `${pct}%` }}
+                              style={{ width: `${fillPct}%` }}
                             />
                           </div>
                           <span className={`text-xs font-bold w-10 ${pctColor}`}>
-                            {pct.toFixed(0)}%
+                            {fillPct}%
                           </span>
                         </div>
                       </div>
                       <div className="flex gap-3 text-xs text-slate-500">
-                        <span>{inst.studentCount}/{inst.courseCount * 30}명</span>
+                        <span>{inst.studentCount}/{cap}명</span>
                         <span>상담 {inst.consultationCount}</span>
                         <span>과정 {inst.courseCount}</span>
                       </div>
