@@ -144,7 +144,7 @@ function CourseSelector() {
       >
         {courses.map((c) => (
           <option key={c.id} value={String(c.id)}>
-            {c.title}{(c as any).enrollmentCount != null ? ` (${(c as any).enrollmentCount}명)` : ''}
+            {c.title}{c.enrollmentCount != null ? ` (${c.enrollmentCount}명)` : ''}
           </option>
         ))}
       </select>

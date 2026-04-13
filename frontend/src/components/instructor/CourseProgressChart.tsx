@@ -1,6 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCourseId } from '../../hooks/useCourseId';
 import { coursesApi } from '../../api/courses';
+import { useEffect, useRef } from 'react';
 
 interface WeekProgress {
   week: number;
@@ -20,17 +21,19 @@ const barColor = (status: string) => {
 
 export default function CourseProgressChart() {
   const courseId = useCourseId();
+  const queryClient = useQueryClient();
+  const recoveryAttempted = useRef<string | null>(null);
 
   const { data: weeks = [] } = useQuery<WeekProgress[]>({
     queryKey: ['instructor', 'course-progress', courseId],
     queryFn: async () => {
       if (!courseId) return [];
       const course = await coursesApi.getCourse(courseId);
-      const courseWeeks = (course as any).weeks as { id: string; weekNo: number; title: string; summary: string }[] | undefined;
+      const courseWeeks = course.weeks;
       if (!courseWeeks || courseWeeks.length === 0) return [];
 
       const now = new Date();
-      const courseStart = new Date(course.createdAt);
+      const courseStart = course.startDate ? new Date(course.startDate) : new Date(course.createdAt);
       const weeksSinceStart = Math.floor((now.getTime() - courseStart.getTime()) / (7 * 24 * 60 * 60 * 1000));
 
       return courseWeeks
@@ -51,6 +54,18 @@ export default function CourseProgressChart() {
     enabled: !!courseId,
     staleTime: 60_000,
   });
+
+  // weeks가 비어있으면 자동으로 recover-weeks 시도
+  useEffect(() => {
+    if (!courseId || weeks.length > 0) return;
+    if (recoveryAttempted.current === courseId) return;
+    recoveryAttempted.current = courseId;
+    coursesApi.recoverWeeks(courseId).then((res) => {
+      if (res.count > 0) {
+        queryClient.invalidateQueries({ queryKey: ['instructor', 'course-progress', courseId] });
+      }
+    }).catch(() => {});
+  }, [courseId, weeks.length, queryClient]);
 
   if (weeks.length === 0) {
     return (

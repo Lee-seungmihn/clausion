@@ -21,7 +21,7 @@ export function useCourseId(): string | undefined {
   }
 
   // Auto-select the first course with enrollments, or just the first one
-  const fallback = courses?.find((c) => (c as any).enrollmentCount > 0) ?? courses?.[0];
+  const fallback = courses?.find((c) => (c.enrollmentCount ?? 0) > 0) ?? courses?.[0];
   const fallbackId = fallback?.id?.toString();
 
   // Persist the auto-selected course

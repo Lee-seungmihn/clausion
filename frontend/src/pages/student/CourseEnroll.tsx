@@ -11,11 +11,8 @@ interface Enrollment {
   status: string;
 }
 
-interface CourseDetail extends Course {
-  weeks?: { id: string; weekNo: number; title: string; summary: string }[];
-  enrollmentCount?: number;
-  createdByName?: string;
-}
+// Course 타입에 weeks, enrollmentCount, createdByName 이미 포함됨
+type CourseDetail = Course;
 
 export default function CourseEnroll() {
   const queryClient = useQueryClient();

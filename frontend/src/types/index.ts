@@ -38,7 +38,10 @@ export interface Course {
   approvalNote?: string;
   maxCapacity?: number;
   createdBy: string;
+  createdByName?: string;
   createdAt: string;
+  weeks?: { id: number; weekNo: number; title: string; summary: string }[];
+  enrollmentCount?: number;
 }
 
 export interface CourseWeek {
