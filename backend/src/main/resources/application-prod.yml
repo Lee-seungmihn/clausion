@@ -75,7 +75,7 @@ app:
 
   aws:
     s3:
-      bucket: ${AWS_S3_BUCKET:gb-ljs}
+      bucket: ${AWS_S3_BUCKET:clausion}
       region: ${AWS_REGION:ap-northeast-2}
       access-key: ${AWS_ACCESS_KEY_ID:}
       secret-key: ${AWS_SECRET_ACCESS_KEY:}
