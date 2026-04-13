@@ -619,7 +619,7 @@ export default function Consultations() {
       </Modal>
 
       {/* 거절 사유 입력 모달 */}
-      <Modal open={!!rejectModalId} onClose={() => { setRejectModalId(null); setRejectReason(''); }} title="상담 요청 거절">
+      <Modal isOpen={!!rejectModalId} onClose={() => { setRejectModalId(null); setRejectReason(''); }} title="상담 요청 거절">
         <div className="space-y-4">
           <p className="text-sm text-slate-600">거절 사유를 입력하면 학생에게 표시됩니다.</p>
           <textarea
