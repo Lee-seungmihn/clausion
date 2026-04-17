@@ -28,6 +28,10 @@ public class RabbitMQConfig {
     public static final String CONSULTATION_QUEUE = "classpulse.consultation.queue";
     public static final String GROUP_CHAT_QUEUE = "classpulse.groupchat.queue";
 
+    // ── Dead-letter infrastructure ─────────────────────────────────────
+    public static final String DLX_EXCHANGE = "classpulse.dlx";
+    public static final String DLQ_QUEUE = "classpulse.dead-letter.queue";
+
     // ── Exchanges ──────────────────────────────────────────────────────
 
     @Bean
@@ -56,30 +60,57 @@ public class RabbitMQConfig {
     }
 
     // ── Queues ─────────────────────────────────────────────────────────
+    //
+    // Every functional queue is wired with a DLX (dead-letter exchange). If a
+    // consumer rejects a message (or the message TTLs out), RabbitMQ routes it to
+    // the classpulse.dead-letter.queue instead of silently dropping it. Ops can
+    // inspect that queue to surface broken consumers.
+
+    private Queue buildWithDlx(String name) {
+        return QueueBuilder.durable(name)
+                .withArgument("x-dead-letter-exchange", DLX_EXCHANGE)
+                .withArgument("x-dead-letter-routing-key", "dead")
+                .build();
+    }
 
     @Bean
     public Queue notificationsQueue() {
-        return QueueBuilder.durable(NOTIFICATIONS_QUEUE).build();
+        return buildWithDlx(NOTIFICATIONS_QUEUE);
     }
 
     @Bean
     public Queue chatbotQueue() {
-        return QueueBuilder.durable(CHATBOT_QUEUE).build();
+        return buildWithDlx(CHATBOT_QUEUE);
     }
 
     @Bean
     public Queue gamificationQueue() {
-        return QueueBuilder.durable(GAMIFICATION_QUEUE).build();
+        return buildWithDlx(GAMIFICATION_QUEUE);
     }
 
     @Bean
     public Queue consultationQueue() {
-        return QueueBuilder.durable(CONSULTATION_QUEUE).build();
+        return buildWithDlx(CONSULTATION_QUEUE);
     }
 
     @Bean
     public Queue groupChatQueue() {
-        return QueueBuilder.durable(GROUP_CHAT_QUEUE).build();
+        return buildWithDlx(GROUP_CHAT_QUEUE);
+    }
+
+    @Bean
+    public DirectExchange deadLetterExchange() {
+        return new DirectExchange(DLX_EXCHANGE);
+    }
+
+    @Bean
+    public Queue deadLetterQueue() {
+        return QueueBuilder.durable(DLQ_QUEUE).build();
+    }
+
+    @Bean
+    public Binding deadLetterBinding(Queue deadLetterQueue, DirectExchange deadLetterExchange) {
+        return BindingBuilder.bind(deadLetterQueue).to(deadLetterExchange).with("dead");
     }
 
     // ── Bindings ───────────────────────────────────────────────────────
