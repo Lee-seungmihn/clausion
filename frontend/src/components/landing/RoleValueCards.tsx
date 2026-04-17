@@ -38,9 +38,9 @@ export default function RoleValueCards() {
     <section className="py-24 px-6 bg-slate-50">
       <div className="max-w-6xl mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
@@ -57,9 +57,9 @@ export default function RoleValueCards() {
           {roles.map((role, i) => (
             <motion.div
               key={role.title}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 1, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, amount: 0.1 }}
               transition={{ duration: 0.5, delay: i * 0.12 }}
               className={`relative p-8 rounded-2xl ${role.bg} border ${role.border} hover:shadow-xl transition-all group`}
             >

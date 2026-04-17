@@ -17,27 +17,27 @@ export default function CTASection() {
 
       <div className="relative z-10 max-w-3xl mx-auto text-center">
         <motion.h2
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.5 }}
           className="text-3xl md:text-4xl font-extrabold text-white mb-4"
         >
           AI와 함께 교육의 미래를 시작하세요
         </motion.h2>
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-white/60 text-lg mb-10"
         >
           ClassPulse Twin으로 학생 이탈을 줄이고, 학습 성과를 극대화하세요.
         </motion.p>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           className="flex items-center justify-center gap-4 flex-wrap"
         >
