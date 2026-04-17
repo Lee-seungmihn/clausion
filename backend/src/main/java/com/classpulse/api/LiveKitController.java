@@ -9,9 +9,11 @@ import com.classpulse.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -19,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -30,11 +33,28 @@ public class LiveKitController {
     private final UserService userService;
     private final NotificationService notificationService;
 
-    @Value("${app.livekit.api-key:devkey}")
+    // No defaults: LIVEKIT_API_KEY / LIVEKIT_API_SECRET must be configured per environment.
+    @Value("${app.livekit.api-key:}")
     private String livekitApiKey;
 
-    @Value("${app.livekit.api-secret:devsecret}")
+    @Value("${app.livekit.api-secret:}")
     private String livekitApiSecret;
+
+    @jakarta.annotation.PostConstruct
+    void validateLiveKitConfig() {
+        if (livekitApiKey == null || livekitApiKey.isBlank()) {
+            throw new IllegalStateException(
+                    "app.livekit.api-key is not configured. Set the LIVEKIT_API_KEY environment variable.");
+        }
+        if (livekitApiSecret == null || livekitApiSecret.isBlank()) {
+            throw new IllegalStateException(
+                    "app.livekit.api-secret is not configured. Set the LIVEKIT_API_SECRET environment variable.");
+        }
+        if ("devkey".equals(livekitApiKey) || "devsecret".equals(livekitApiSecret)) {
+            throw new IllegalStateException(
+                    "LiveKit credentials appear to be the placeholder 'devkey'/'devsecret'. Replace them.");
+        }
+    }
 
     // --- DTOs ---
 
@@ -46,29 +66,52 @@ public class LiveKitController {
             Long consultationId, String roomName, String status, String token
     ) {}
 
+    // --- Auth helpers ---
+
+    private Consultation loadConsultation(Long id) {
+        return consultationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consultation not found"));
+    }
+
+    /** Throws 403 unless the current user is either the student or instructor of this consultation. */
+    private void assertParticipant(Consultation consultation, Long userId) {
+        Long studentId = consultation.getStudent() != null ? consultation.getStudent().getId() : null;
+        Long instructorId = consultation.getInstructor() != null ? consultation.getInstructor().getId() : null;
+        if (!Objects.equals(userId, studentId) && !Objects.equals(userId, instructorId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not a participant of this consultation");
+        }
+    }
+
+    /** Throws 403 unless the current user is the assigned instructor of this consultation. */
+    private void assertInstructor(Consultation consultation, Long userId) {
+        Long instructorId = consultation.getInstructor() != null ? consultation.getInstructor().getId() : null;
+        if (!Objects.equals(userId, instructorId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the assigned instructor can perform this action");
+        }
+    }
+
     // --- Endpoints ---
 
     @PostMapping("/api/livekit/token")
+    @Transactional
     public ResponseEntity<TokenResponse> generateToken(@RequestBody TokenRequest request) {
+        // Tokens must be bound to a consultation the caller participates in.
+        // Arbitrary roomName is ignored — the server decides the room from the consultation.
+        if (request.consultationId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "consultationId is required");
+        }
+
         Long userId = SecurityUtil.getCurrentUserId();
         User user = userService.findById(userId);
 
-        String roomName = request.roomName();
+        Consultation consultation = loadConsultation(request.consultationId());
+        assertParticipant(consultation, userId);
 
-        // If consultationId is provided instead of roomName, derive it from the consultation
-        if ((roomName == null || roomName.isBlank()) && request.consultationId() != null) {
-            Consultation consultation = consultationRepository.findById(request.consultationId())
-                    .orElseThrow(() -> new IllegalArgumentException("Consultation not found: " + request.consultationId()));
-            roomName = consultation.getVideoRoomName();
-            if (roomName == null || roomName.isBlank()) {
-                roomName = "consultation-" + request.consultationId() + "-" + UUID.randomUUID().toString().substring(0, 8);
-                consultation.setVideoRoomName(roomName);
-                consultationRepository.save(consultation);
-            }
-        }
-
+        String roomName = consultation.getVideoRoomName();
         if (roomName == null || roomName.isBlank()) {
-            return ResponseEntity.badRequest().build();
+            roomName = "consultation-" + consultation.getId() + "-" + UUID.randomUUID().toString().substring(0, 8);
+            consultation.setVideoRoomName(roomName);
+            consultationRepository.save(consultation);
         }
 
         String participantName = request.participantName() != null
@@ -85,8 +128,9 @@ public class LiveKitController {
         Long userId = SecurityUtil.getCurrentUserId();
         User user = userService.findById(userId);
 
-        Consultation consultation = consultationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Consultation not found: " + id));
+        Consultation consultation = loadConsultation(id);
+        // Only the assigned instructor may initiate an INCOMING_CALL notification.
+        assertInstructor(consultation, userId);
 
         // Reuse existing room name if already set, otherwise generate a new one
         String roomName = consultation.getVideoRoomName();
@@ -121,9 +165,13 @@ public class LiveKitController {
     }
 
     @PostMapping("/api/consultations/{id}/end-video")
+    @Transactional
     public ResponseEntity<VideoSessionResponse> endVideo(@PathVariable Long id) {
-        Consultation consultation = consultationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Consultation not found: " + id));
+        Long userId = SecurityUtil.getCurrentUserId();
+
+        Consultation consultation = loadConsultation(id);
+        // Either party can end the call.
+        assertParticipant(consultation, userId);
 
         String roomName = consultation.getVideoRoomName();
         consultation.setStatus("VIDEO_ENDED");

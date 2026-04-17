@@ -46,8 +46,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+// Dev/test-only. Never runs under the `prod` profile and is additionally gated by
+// the `app.seed.enabled` property (default true) so CI or local dev can disable it.
 @Slf4j
 @Component
+@org.springframework.context.annotation.Profile("!prod")
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(
+        prefix = "app.seed", name = "enabled", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 public class MockDataSeeder implements CommandLineRunner {
 

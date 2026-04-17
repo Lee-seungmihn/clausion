@@ -31,6 +31,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                // CSRF disabled: API is stateless (JWT in Authorization header, no session
+                // cookies). CSRF protection guards against cookie-based auth being abused
+                // by cross-origin forms — not applicable here.
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

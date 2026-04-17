@@ -22,13 +22,17 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        List<String> patterns = new java.util.ArrayList<>(Arrays.stream(allowedOrigins.split(","))
+        List<String> patterns = Arrays.stream(allowedOrigins.split(","))
                 .map(String::trim)
                 .filter(origin -> !origin.isEmpty())
-                .toList());
-        // Ensure Railway subdomains are always allowed
-        if (patterns.stream().noneMatch(p -> p.contains("*.up.railway.app"))) {
-            patterns.add("https://*.up.railway.app");
+                .toList();
+        // Only explicit origins allowed. A wildcard like `https://*.up.railway.app`
+        // combined with allowCredentials=true lets any attacker who can deploy to
+        // railway.app read credentialed responses. The deployment config must list
+        // the exact frontend host(s) via CORS_ALLOWED_ORIGINS.
+        if (patterns.isEmpty()) {
+            throw new IllegalStateException(
+                    "app.cors.allowed-origins is empty — configure CORS_ALLOWED_ORIGINS with exact origins.");
         }
         configuration.setAllowedOriginPatterns(patterns);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

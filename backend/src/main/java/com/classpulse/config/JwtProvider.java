@@ -21,7 +21,10 @@ import java.util.stream.Collectors;
 @Component
 public class JwtProvider {
 
-    @Value("${app.jwt.secret:default-secret-key-change-in-production-must-be-at-least-256-bits-long}")
+    // No default value: the property MUST be provided via env/config. An unset
+    // secret means the app refuses to start rather than signing tokens with a
+    // well-known fallback that anyone could forge against.
+    @Value("${app.jwt.secret:}")
     private String secret;
 
     @Value("${app.jwt.expiration:86400000}")
@@ -31,6 +34,17 @@ public class JwtProvider {
 
     @PostConstruct
     public void init() {
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException(
+                    "app.jwt.secret is not configured. Set the JWT_SECRET environment variable to a random 32+ byte value.");
+        }
+        if (secret.startsWith("default-secret")
+                || secret.contains("change-in-prod")
+                || secret.contains("dev-only")
+                || secret.contains("for-dev")) {
+            throw new IllegalStateException(
+                    "app.jwt.secret appears to be a placeholder/dev value. Replace it with a unique random value (e.g. `openssl rand -base64 48`).");
+        }
         byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
         if (keyBytes.length < 32) {
             throw new IllegalArgumentException("JWT secret must be at least 256 bits (32 bytes)");
@@ -92,6 +106,11 @@ public class JwtProvider {
         } catch (ExpiredJwtException e) {
             return true;
         }
+    }
+
+    public long extractExpiration(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.getExpiration().getTime();
     }
 
     private Claims extractAllClaims(String token) {
