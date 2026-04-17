@@ -100,7 +100,18 @@ export default function Login() {
                 autoComplete="username"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  e.target.setCustomValidity('');
+                  setEmail(e.target.value);
+                }}
+                onInvalid={(e) => {
+                  const el = e.currentTarget;
+                  el.setCustomValidity(
+                    el.validity.valueMissing
+                      ? '이메일을 입력해주세요.'
+                      : '올바른 이메일 주소를 입력해주세요.',
+                  );
+                }}
                 placeholder="example@university.ac.kr"
                 className="w-full px-4 py-2.5 rounded-lg border border-slate-300 bg-white text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all"
               />
@@ -117,7 +128,11 @@ export default function Login() {
                 autoComplete="current-password"
                 required
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  e.target.setCustomValidity('');
+                  setPassword(e.target.value);
+                }}
+                onInvalid={(e) => e.currentTarget.setCustomValidity('비밀번호를 입력해주세요.')}
                 placeholder="••••••••"
                 className="w-full px-4 py-2.5 rounded-lg border border-slate-300 bg-white text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition-all"
               />
